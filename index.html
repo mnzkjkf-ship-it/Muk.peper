@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kawaii Wallpaper 500 รูป - วาดจริงทุกใบ</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:system-ui,sans-serif}
+body{background:#fff7fb}
+header{background:linear-gradient(90deg,#8b5e3c,#ff9ecb,#7dd3fc,#c4b5fd,#a7d8a9,#fde047);padding:18px;text-align:center;color:#fff;text-shadow:0 2px 8px rgba(0,0,0,.3);position:sticky;top:0;z-index:20}
+header h1{font-size:26px}header p{font-size:13px}
+.bar{max-width:1200px;margin:auto;padding:12px}
+.search input{width:100%;padding:13px 16px;border-radius:999px;border:2px solid #ffd1e8;outline:none;font-size:15px}
+.chips{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin:12px 0}
+.chip{padding:9px 15px;border-radius:999px;background:#fff;box-shadow:0 2px 8px rgba(0,0,0,.08);font-weight:800;cursor:pointer;border:2px solid transparent}
+.chip.active{background:#ff4d9e;color:#fff}
+.dev{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+.dev button{padding:10px 14px;border-radius:12px;background:#eee;font-weight:800;cursor:pointer;border:none}
+.dev button.active{background:#111;color:#fff}
+.dev2{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;margin-top:8px}
+.dev2 button{padding:8px 12px;border-radius:999px;background:#fff;border:1px solid #eee;font-size:12px;font-weight:700;cursor:pointer}
+.dev2 button.active{background:#111;color:#fff}
+.tools{display:flex;gap:8px;justify-content:center;margin:12px 0;flex-wrap:wrap}
+.tools button{padding:11px 18px;border-radius:999px;background:#111;color:#fff;font-weight:800;cursor:pointer;border:none}
+.tools button.pink{background:#ff4d9e}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:12px;padding:0 12px 40px;max-width:1200px;margin:auto}
+.card{background:#fff;border-radius:18px;overflow:hidden;box-shadow:0 4px 16px rgba(0,0,0,.08)}
+.card canvas{width:100%;height:240px;display:block;cursor:pointer}
+.info{padding:8px 10px}.info b{font-size:13px}.info span{font-size:11px;color:#999}
+.row{display:flex;gap:6px;padding:0 10px 10px}.row button{flex:1;padding:9px;border-radius:10px;border:none;font-weight:800;cursor:pointer}.dl{background:#ff4d9e;color:#fff}.view{background:#f3f3f3}
+#modal{position:fixed;inset:0;background:rgba(0,0,0,.85);display:none;align-items:center;justify-content:center;z-index:99;padding:14px}#modal.show{display:flex}
+#mbox{background:#fff;border-radius:20px;max-width:440px;width:100%;padding:12px;text-align:center}#mbox canvas{width:100%;border-radius:14px}#mbox button{width:100%;padding:12px;margin-top:8px;border-radius:12px;border:none;font-weight:800;cursor:pointer}
+@media(max-width:520px){.grid{grid-template-columns:1fr 1fr}.card canvas{height:200px}}
+</style>
+</head>
+<body>
+<header><h1>🧸 Kawaii Wallpaper 500 รูปวาดจริง 🎀</h1><p>คอมทุกรุ่น • มือถือทุกรุ่น • ไอแพดทุกรุ่น | วาดใหม่ไม่ซ้ำ 500 ใบ | โหลด HD</p></header>
+<div class="bar">
+<div class="search"><input id="q" placeholder="🔍 ค้นหา... หมี คิตตี้ ช็อกโกแลต มัทฉะ เลมอน..." oninput="render()"></div>
+<div class="chips" id="chips"></div>
+<div class="dev">
+<button class="active" data-group="all" onclick="setGroup('all',this)">✨ ทั้งหมด 500 รูป</button>
+<button data-group="phone" onclick="setGroup('phone',this)">📱 มือถือทุกรุ่น</button>
+<button data-group="pc" onclick="setGroup('pc',this)">💻 คอมทุกรุ่น</button>
+<button data-group="ipad" onclick="setGroup('ipad',this)">📱 ไอแพดทุกรุ่น</button>
+</div>
+<div class="dev2" id="models"></div>
+<div class="tools"><button class="pink" onclick="shuffle()">🎲 สุ่มลายใหม่ 500 รูป</button><button onclick="loadMore()">➕ โหลดเพิ่มอีก 30 รูป</button><span id="count" style="align-self:center;font-weight:800"></span></div>
+</div>
+<div class="grid" id="grid"></div>
+<div id="modal" onclick="if(event.target==this)closeModal()"><div id="mbox"><canvas id="big"></canvas><h3 id="bigTitle"></h3><p id="bigSub" style="color:#999;font-size:12px"></p><button style="background:#ff4d9e;color:#fff" onclick="dlCurrent()">⬇ ดาวน์โหลด HD เข้าเครื่อง</button><button onclick="closeModal()">ปิด</button></div></div>
+<script>
+let activeTone='ทั้งหมด', activeGroup='all', activeModel='ทุกรุ่น', limit=30, shuffleSeed=0, current=null;
+const tones=[
+{name:'ทั้งหมด',c:'#ff4d9e'},
+{name:'น้ำตาลช็อกโกแลต',c:'#8b5e3c'},{name:'ชมพูพาสเทล',c:'#ff9ecb'},
+{name:'ฟ้าเบบี้บลู',c:'#7dd3fc'},{name:'ม่วงลาเวนเดอร์',c:'#c4b5fd'},
+{name:'เขียวมัทฉะ',c:'#a7d8a9'},{name:'เหลืองเลมอน',c:'#fde047'},
+];
+const models={
+phone:['ทุกรุ่น','iPhone 16 Pro Max','iPhone 16','iPhone 15','iPhone 14','iPhone 13','iPhone SE','Samsung S25 Ultra','Samsung S24','Samsung A55','OPPO Reno','Vivo V30','Xiaomi 14','Realme 12','Pixel 9'],
+pc:['ทุกรุ่น','MacBook Air 13','MacBook Air 15','MacBook Pro 14','MacBook Pro 16','iMac 24','Windows Laptop 14','Windows Laptop 15.6','Windows Laptop 16','PC Desktop 24','PC Desktop 27','PC Ultrawide 34','Notebook 13'],
+ipad:['ทุกรุ่น','iPad Pro 11','iPad Pro 12.9','iPad Air 11','iPad Air 13','iPad 10','iPad 9','iPad mini 6','iPad mini 7','Galaxy Tab S9','Galaxy Tab A9','Xiaomi Pad 6']
+};
+const sizes={
+phone:{w:1080,h:1920,label:'มือถือ 1080x1920'},
+pc:{w:1920,h:1080,label:'คอม 1920x1080'},
+ipad:{w:1536,h:2048,label:'ไอแพด 1536x2048'}
+};
+const pal={
+'น้ำตาลช็อกโกแลต':['#fff7ed','#e7c9a9','#8b5e3c','#5b3a1e'],
+'ชมพูพาสเทล':['#fff1f5','#ffd1e8','#ff9ecb','#ff4d9e'],
+'ฟ้าเบบี้บลู':['#f0f9ff','#bae6fd','#7dd3fc','#0284c7'],
+'ม่วงลาเวนเดอร์':['#faf5ff','#ddd6fe','#c4b5fd','#8b5cf6'],
+'เขียวมัทฉะ':['#f0fdf4','#bbf7d0','#86efac','#4d7c0f'],
+'เหลืองเลมอน':['#fefce8','#fef08a','#fde047','#f59e0b'],
+};
+const styles=['หมีน้อย','คิตตี้','ตารางกริด','พระจันทร์ & ดาว','Widget','หัวใจวิบวับ','เมฆ','ดอกไม้'];
+function rnd(s){ let x=Math.sin(s)*10000; return x-Math.floor(x); }
+function draw(canvas,item){
+  let sz=sizes[item.group]; canvas.width=sz.w; canvas.height=sz.h;
+  let ctx=canvas.getContext('2d'); let p=pal[item.tone];
+  let g=ctx.createLinearGradient(0,0,sz.w,sz.h); g.addColorStop(0,p[0]); g.addColorStop(.5,p[1]); g.addColorStop(1,p[2]);
+  ctx.fillStyle=g; ctx.fillRect(0,0,sz.w,sz.h);
+  // grid
+  ctx.strokeStyle='rgba(255,255,255,.45)'; ctx.lineWidth=2;
+  for(let i=0;i<sz.w;i+=110){ctx.beginPath();ctx.moveTo(i,0);ctx.lineTo(i,sz.h);ctx.stroke();}
+  for(let j=0;j<sz.h;j+=110){ctx.beginPath();ctx.moveTo(0,j);ctx.lineTo(sz.w,j);ctx.stroke();}
+  // real drawn bear / kitty - hand drawn with canvas shapes
+  let cx=sz.w/2, cy=sz.h*0.48, R=sz.w*0.28, seed=item.seed+shuffleSeed;
+  // ears
+  ctx.fillStyle=p[3]; ctx.beginPath(); ctx.arc(cx-R*0.65,cy-R*0.75,R*0.35,0,7); ctx.fill();
+  ctx.beginPath(); ctx.arc(cx+R*0.65,cy-R*0.75,R*0.35,0,7); ctx.fill();
+  // face
+  ctx.fillStyle='#fff8f0'; if(item.tone==='เขียวมัทฉะ') ctx.fillStyle='#e8f5d6';
+  ctx.beginPath(); ctx.arc(cx,cy,R,0,7); ctx.fill();
+  ctx.strokeStyle=p[3]; ctx.lineWidth=6; ctx.stroke();
+  // eyes
+  ctx.fillStyle='#2b1a12';
+  ctx.beginPath(); ctx.arc(cx-R*0.35,cy-R*0.05,R*0.12,0,7); ctx.fill();
+  ctx.beginPath(); ctx.arc(cx+R*0.35,cy-R*0.05,R*0.12,0,7); ctx.fill();
+  ctx.fillStyle='#fff'; ctx.beginPath(); ctx.arc(cx-R*0.32,cy-R*0.09,R*0.04,0,7); ctx.fill();
+  ctx.beginPath(); ctx.arc(cx+R*0.38,cy-R*0.09,R*0.04,0,7); ctx.fill();
+  // cheeks
+  ctx.fillStyle='rgba(255,120,160,.45)'; ctx.beginPath(); ctx.arc(cx-R*0.55,cy+R*0.22,R*0.16,0,7); ctx.fill(); ctx.beginPath(); ctx.arc(cx+R*0.55,cy+R*0.22,R*0.16,0,7); ctx.fill();
+  // nose + mouth
+  ctx.fillStyle='#5b3a1e'; ctx.beginPath(); ctx.ellipse(cx,cy+R*0.18,R*0.12,R*0.09,0,0,7); ctx.fill();
+  ctx.strokeStyle='#5b3a1e'; ctx.lineWidth=5; ctx.beginPath(); ctx.arc(cx-R*0.15,cy+R*0.38,R*0.15,0.2,2.8); ctx.stroke(); ctx.beginPath(); ctx.arc(cx+R*0.15,cy+R*0.38,R*0.15,0.3,2.9); ctx.stroke();
+  // bow for kitty style
+  if(item.style==='คิตตี้'){ ctx.fillStyle='#ff4d9e'; ctx.beginPath(); ctx.moveTo(cx+R*0.45,cy-R*0.95); ctx.lineTo(cx+R*0.85,cy-R*1.15); ctx.lineTo(cx+R*0.85,cy-R*0.75); ctx.fill(); ctx.beginPath(); ctx.moveTo(cx+R*0.45,cy-R*0.95); ctx.lineTo(cx+R*0.05,cy-R*1.15); ctx.lineTo(cx+R*0.05,cy-R*0.75); ctx.fill(); ctx.beginPath(); ctx.arc(cx+R*0.45,cy-R*0.95,R*0.08,0,7); ctx.fill(); }
+  // stickers around - drawn shapes
+  const em=['🧸','🎀','🌙','⭐','💖','🍋','🍵','🌸','☁️'];
+  for(let i=0;i<26;i++){ let x=rnd(seed+i*13)*sz.w, y=rnd(seed+i*29)*sz.h; ctx.font=(30+rnd(seed+i*7)*60)+'px serif'; ctx.textAlign='center'; ctx.fillText(em[i%em.length],x,y); }
+  // label badge - no text if user wants clean? keep small number only
+  ctx.fillStyle='rgba(255,255,255,.9)'; ctx.beginPath(); ctx.roundRect(cx-sz.w*0.28,cy+R*1.25,sz.w*0.56,sz.h*0.045,20); ctx.fill();
+  ctx.fillStyle='#888'; ctx.font='bold 28px sans-serif'; ctx.textAlign='center'; ctx.fillText('No.'+item.seed+' • '+item.style, cx, cy+R*1.25+32);
+}
+function buildList(){
+  let list=[];
+  for(let i=1;i<=500;i++){
+    let tone=tones[1+(i%6)].name;
+    let style=styles[i%styles.length];
+    let group = i%3===0?'phone': i%3===1?'pc':'ipad';
+    let modelList=models[group]; let model=modelList[i%modelList.length];
+    list.push({seed:i,tone,style,group,model,title:style+' • '+tone+' #'+i});
+  }
+  if(activeGroup!=='all') list=list.filter(x=>x.group===activeGroup);
+  if(activeTone!=='ทั้งหมด') list=list.filter(x=>x.tone===activeTone);
+  if(activeModel!=='ทุกรุ่น') list=list.filter(x=>x.model===activeModel);
+  let q=document.getElementById('q').value.toLowerCase();
+  if(q) list=list.filter(x=>x.title.toLowerCase().includes(q)||x.model.toLowerCase().includes(q));
+  return list;
+}
+function render(){
+  document.querySelectorAll('.chip').forEach(c=>c.classList.toggle('active',c.textContent===activeTone));
+  let list=buildList(); document.getElementById('count').textContent='เจอ '+list.length+' / 500 รูป • โชว์ '+Math.min(limit,list.length)+' รูป';
+  let grid=document.getElementById('grid'); grid.innerHTML='';
+  list.slice(0,limit).forEach(item=>{
+    let div=document.createElement('div'); div.className='card';
+    let cv=document.createElement('canvas'); draw(cv,item);
+    cv.onclick=()=>openModal(item);
+    div.innerHTML=`<div class="info"><b>${item.title}</b><br><span>${item.model} • ${sizes[item.group].label} • ${item.tone}</span></div><div class="row"><button class="view">👀 ดู</button><button class="dl">⬇ โหลด HD</button></div>`;
+    div.prepend(cv);
+    div.querySelector('.view').onclick=()=>openModal(item);
+    div.querySelector('.dl').onclick=()=>{ let a=document.createElement('a'); a.download='kawaii-500-'+item.seed+'.png'; a.href=cv.toDataURL('image/png'); a.click(); };
+    grid.appendChild(div);
+  });
+  renderModels();
+}
+function renderModels(){
+  let wrap=document.getElementById('models'); wrap.innerHTML='';
+  let list = activeGroup==='all'? [...models.phone,...models.pc,...models.ipad] : models[activeGroup];
+  let uniq=[...new Set(list)];
+  uniq.forEach(m=>{ let b=document.createElement('button'); b.textContent=m; if(m===activeModel) b.classList.add('active'); b.onclick=()=>{activeModel=m; limit=30; render();}; wrap.appendChild(b); });
+}
+function setGroup(g,el){ activeGroup=g; activeModel='ทุกรุ่น'; document.querySelectorAll('.dev button').forEach(x=>x.classList.remove('active')); el.classList.add('active'); limit=30; render(); }
+function shuffle(){ shuffleSeed=Math.floor(Math.random()*10000); limit=30; render(); window.scrollTo({top:0,behavior:'smooth'}); }
+function loadMore(){ limit+=30; render(); }
+function openModal(item){ current=item; let big=document.getElementById('big'); draw(big,item); document.getElementById('bigTitle').textContent=item.title; document.getElementById('bigSub').textContent=item.model+' • '+sizes[item.group].label+' • '+item.tone+' • วาดจริง No.'+item.seed; document.getElementById('modal').classList.add('show'); }
+function closeModal(){ document.getElementById('modal').classList.remove('show'); }
+function dlCurrent(){ if(!current) return; let a=document.createElement('a'); a.download='kawaii-500-'+current.seed+'-HD.png'; a.href=document.getElementById('big').toDataURL('image/png'); a.click(); }
+let chips=document.getElementById('chips');
+tones.forEach(t=>{ let b=document.createElement('button'); b.className='chip'; b.textContent=t.name; b.style.borderColor=t.c; b.onclick=()=>{activeTone=t.name; limit=30; render();}; chips.appendChild(b); });
+render();
+</script>
+</body>
+</html>
